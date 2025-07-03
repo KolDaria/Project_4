@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="border-bottom pb-2 mb-0">Добро пожаловать</h2>
+    <div class="d-flex text-body-secondary pt-3">
+        <div class="pb-4 mb-0 small lh-sm border-bottom w-100">
+            <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Всего рассылок:</strong>
+                <span>{{ total_mailings }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Активных рассылок:</strong>
+                <span>{{ active_mailings }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Уникальных получателей:</strong>
+                <span>{{ unique_clients }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <strong class="text-gray-dark">Всего попыток рассылок:</strong>
+                <span>{{ total_attempts }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <strong class="text-gray-dark">Успешных попыток рассылок:</strong>
+                <span>{{ successful_attempts }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <strong class="text-gray-dark">Неуспешных попыток рассылок:</strong>
+                <span>{{ failed_attempts }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load cache %}
+
+{% cache 60 * 5 template_fragment_name some_variable %}
+<div class="container mt-5">
+    <h1 class="mb-4">{{ recipient.email }}</h1>
+    <p> Email: {{ recipient.email }}</p>
+    <p> ФИО: {{ recipient.name }}</p>
+    <p> Комментарий: {{ recipient.comment }}</p>
+    {% endcache %}
+
+    {% if recipient.user == user or perms.user.mailing.can_view_recipient %}
+    <a href="{% url 'mailing:recipient_edit' recipient.pk %}" class="btn btn-dark rounded-pill px-3">Редактировать</a>
+    <a href="{% url 'mailing:recipient_delete' recipient.pk %}" class="btn btn-dark rounded-pill px-3">Удалить</a>
+    {% endif %}
+
+    <a href="{% url 'mailing:recipient_list' %}" class="btn btn-dark rounded-pill px-3">Вернуться к списку</a>
+</div>
+{% endblock %}

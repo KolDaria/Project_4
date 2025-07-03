@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Рассылка: {{ mailing.message }}</h1>
+    <p>Статус: {{ mailing.get_status_display }}</p>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li
+        {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if perms.mailing.can_complete_mailing or mailing.user == user and mailing.status == 'created'%}
+    <form method="post" action="{% url 'mailing:start_mailing' mailing.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-dark rounded-pill px-3" type="submit" {% if mailing.status !='created' %}disabled{% endif
+                %}>Запустить рассылку
+        </button>
+    </form>
+    {% endif %}
+
+    {% if perms.mailing.can_complete_mailing %}
+    <form method="post" action="{% url 'mailing:complete_mailing' mailing.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-dark rounded-pill px-3" type="submit" {% if mailing.status !='running' %}disabled{% endif
+                %}>Завершить рассылку
+        </button>
+    </form>
+    {% endif %}
+
+    {% if mailing.user == user or perms.mailing.can_set_mailing_status %}
+    <a href="{% url 'mailing:mailing_edit' mailing.pk %}" class="btn btn-dark rounded-pill px-3">Редактировать</a>
+    <a href="{% url 'mailing:mailing_delete' mailing.pk %}" class="btn btn-dark rounded-pill px-3">Удалить</a>
+    {% endif %}
+
+    <a href="{% url 'mailing:mailing_list' %}" class="btn btn-dark rounded-pill px-3">Вернуться к списку</a>
+</div>
+{% endblock %}
