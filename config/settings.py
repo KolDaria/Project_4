@@ -115,6 +115,41 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '[%(levelname)s] %(asctime)s %(module)s: %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'mailing_errors.log',  # Замените на путь к файлу, куда вы хотите записывать логи
+            'formatter': 'default',
+        },
+    },
+    'loggers': {
+        '': {  # root logger - все сообщения
+            'handlers': ['console', 'file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'mailing': {  # logger для вашего приложения
+            'handlers': ['console', 'file'],
+            'level': 'ERROR',  # или DEBUG, если хотите видеть больше информации
+            'propagate': True,
+        },
+    },
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 

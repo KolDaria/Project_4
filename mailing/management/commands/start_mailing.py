@@ -1,7 +1,9 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from django.utils import timezone
 
 from mailing.models import Mailing
+from mailing.services import send_mailing
 
 
 class Command(BaseCommand):
@@ -9,24 +11,36 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('mailing_id', type=int, help='ID рассылки')
-        parser.add_argument('action', type=str, choices=['start', 'complete'], help='Действие: start или complete')
 
     def handle(self, *args, **options):
         mailing_id = options['mailing_id']
-        action = options['action']
 
         try:
             mailing = Mailing.objects.get(pk=mailing_id)
+
+            if mailing.status == 'created' or mailing.status == 'completed':
+                # Запускаем рассылку (логика "start")
+                send_mailing(mailing)  # Отправляем рассылку синхронно
+                mailing.status = 'running'
+                if mailing.first_send_datetime is None:
+                    mailing.first_send_datetime = timezone.now()
+                mailing.end_send_datetime = timezone.now() # Обновляем дату окончания при каждой отправке
+                with transaction.atomic():
+                    mailing.save()  # Оборачиваем в транзакцию сохранение
+                self.stdout.write(self.style.SUCCESS(
+                    f"Рассылка '{mailing.message.subject_letter}' (ID: {mailing_id}) запущена."))
+
+            elif mailing.status == 'running':
+                # Завершаем рассылку (логика "complete")
+                mailing.status = 'completed'
+                mailing.end_send_datetime = timezone.now()
+                mailing.save()
+                self.stdout.write(self.style.SUCCESS(
+                    f"Рассылка '{mailing.message.subject_letter}' (ID: {mailing_id}) завершена."))
+            else:
+                 self.stdout.write(self.style.WARNING(f"Рассылка '{mailing.message.subject_letter}' (ID: {mailing_id}) не может быть запущена или завершена."))
+
         except Mailing.DoesNotExist:
-            self.stdout.write(self.style.ERROR(f'Рассылка с ID {mailing_id} не найдена'))
-            return
-
-        if action == 'start':
-            mailing.first_send_datetime = timezone.now()
-        elif action == 'complete':
-            mailing.end_send_datetime = timezone.now()
-
-        mailing.update_status()
-        mailing.save()
-
-        self.stdout.write(self.style.SUCCESS(f'Рассылка {mailing.pk} ({action})'))
+            raise CommandError(f'Рассылка с ID {mailing_id} не найдена.')
+        except Exception as e:
+            raise CommandError(f'Ошибка: {e}')

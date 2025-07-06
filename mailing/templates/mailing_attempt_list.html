@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">История попыток отправки</h1>
+  <ul>
+    {% for attempt in attempts %}
+       <li class="list-group-item">
+        <strong>Дата:</strong> {{ attempt.attempt_datetime }}<br>
+        <strong>Статус:</strong> {{ attempt.get_status_display }}<br>
+        <strong>Ответ сервера:</strong> {{ attempt.mail_server_response }}<br>
+        <strong>Рассылка:</strong> <a href="{% url 'mailing:mailing_detail' attempt.mailing.pk %}">{{ attempt.mailing.message.subject_letter }}</a>
+      </li>
+    {% empty %}
+      <li>Нет попыток отправки.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

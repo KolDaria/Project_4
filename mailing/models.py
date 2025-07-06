@@ -109,6 +109,7 @@ class Mailing(models.Model):
             ("can_set_mailing_status", "Можно установить статус рассылки"),
             ("can_disable_mailing", "Может отключать рассылку"),
             ("can_complete_mailing", "Может завершать рассылку"),
+            ("can_view_all_mailings", "Может просмотреть все рассылки"),
         ]
 
 

@@ -1,10 +1,9 @@
-from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
 
 from users.apps import UsersConfig
-from users.views import RegisterView, edit_profile, email_verification, view_own_profile, view_profile
+from users.views import RegisterView, edit_profile, email_verification, view_own_profile, view_profile, user_list, \
+    toggle_user_status
 
 app_name = UsersConfig.name
 
@@ -16,7 +15,6 @@ urlpatterns = [
     path('profile/edit/', edit_profile, name='edit_profile'),
     path('profile/<int:pk>/', view_profile, name='profile'),
     path('profile/', view_own_profile, name='profile_own'),
+    path('users/', user_list, name='user_list'),
+    path('<int:user_id>/toggle/', toggle_user_status, name='toggle_user_status'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

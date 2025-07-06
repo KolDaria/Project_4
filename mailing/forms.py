@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import BooleanField, ModelForm
 
-from mailing.models import Mailing, Recipient
+from mailing.models import Mailing, Recipient, Message
 
 
 class StyleFormMixin:
@@ -14,13 +14,15 @@ class StyleFormMixin:
                 fild.widget.attrs['class'] = 'form-control'
 
 
-class MailingForm(StyleFormMixin, ModelForm):
-    recipients = forms.ModelMultipleChoiceField(
-        queryset=Recipient.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        label="Получатели"
-    )
+class MailingForm(ModelForm):
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['recipient'].queryset = Recipient.objects.filter(user=user)
+        self.fields['message'].queryset = Message.objects.filter(user=user)
+
 
     class Meta:
         model = Mailing
-        fields = ['message', 'recipients', 'status']
+        fields = ['message', 'recipient', 'status']
+
+

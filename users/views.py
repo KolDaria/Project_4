@@ -1,15 +1,17 @@
 import secrets
 
-from django.contrib.auth.decorators import login_required, permission_required
 from django.core.mail import BadHeaderError, send_mail
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView
+from django.contrib import messages
 
 from config.settings import EMAIL_HOST_USER
 from users.forms import ProfileForm, UserRegisterForm
 from users.models import User
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required, permission_required
 
 
 class RegisterView(CreateView):
@@ -81,4 +83,23 @@ def block_user(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     user.is_blocked = True
     user.save()
+    return redirect('users:user_list')
+
+
+@permission_required('auth.view_user')  # or specific permission
+def user_list(request):
+    users = User.objects.all()
+    return render(request, 'users:user_list.html', {'users': users})
+
+@permission_required('auth.change_user')
+def toggle_user_status(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    if user == request.user:
+        messages.error(request, "Нельзя заблокировать самого себя.")
+    elif user.is_superuser:
+        messages.error(request, "Нельзя заблокировать суперпользователя.")
+    else:
+        user.is_active = not user.is_active
+        user.save()
+        messages.success(request, f"Пользователь {user.username} {'заблокирован' if not user.is_active else 'активирован'}.")
     return redirect('users:user_list')

@@ -1,12 +1,11 @@
-from django.conf import settings
-from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, include
 
 from mailing.apps import MailingConfig
 from mailing.views import (MailingCreateView, MailingDeleteView, MailingDetailView, MailingListView, MailingUpdateView,
                            MessageCreateView, MessageDeleteView, MessageDetailView, MessageListView, MessageUpdateView,
                            RecipientCreateView, RecipientDeleteView, RecipientDetailView, RecipientListView,
-                           RecipientUpdateView, complete_mailing_view, main_page, start_mailing_view)
+                           RecipientUpdateView, complete_mailing_view, main_page, start_mailing_view, send_mailing_view,
+                           MailingAttemptListView)
 
 app_name = MailingConfig.name
 
@@ -29,7 +28,7 @@ urlpatterns = [
     path('mailing/<int:pk>/delete/', MailingDeleteView.as_view(), name='mailing_delete'),
     path('mailing/<int:mailing_id>/start/', start_mailing_view, name='start_mailing'),
     path('mailing/<int:mailing_id>/complete/', complete_mailing_view, name='complete_mailing'),
+    path('mailing/<int:mailing_id>/send/', send_mailing_view, name='send_mailing'),
+    path('attempts/', MailingAttemptListView.as_view(), name='mailing_attempt_list'),
+    path('users/<int:user_id>/toggle/', include('users.urls')),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

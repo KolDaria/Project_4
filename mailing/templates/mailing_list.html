@@ -7,6 +7,9 @@
         {% for mailing in mailings %}
         <li class="list-group-item">
             <a href="{% url 'mailing:mailing_detail' mailing.pk %}">{{ mailing.message }}</a>
+            {% if mailing.user == user or perms.mailing.can_set_mailing_status %}
+            <a href="{% url 'mailing:send_mailing' mailing.pk %}" class="btn btn-dark rounded-pill px-3">Отправить</a>
+            {% endif %}
             {% if mailing.can_change %}
             <a href="{% url 'mailing:mailing_edit' mailing.pk %}"
                class="btn btn-dark rounded-pill px-3">Редактировать</a>

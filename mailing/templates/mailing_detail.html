@@ -3,7 +3,6 @@
 {% block content %}
 <div class="container mt-5">
     <h1>Рассылка: {{ mailing.message }}</h1>
-    <p>Статус: {{ mailing.get_status_display }}</p>
 
     {% if messages %}
     <ul class="messages">
@@ -12,24 +11,6 @@
         {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
     </ul>
-    {% endif %}
-
-    {% if perms.mailing.can_complete_mailing or mailing.user == user and mailing.status == 'created'%}
-    <form method="post" action="{% url 'mailing:start_mailing' mailing.pk %}">
-        {% csrf_token %}
-        <button class="btn btn-dark rounded-pill px-3" type="submit" {% if mailing.status !='created' %}disabled{% endif
-                %}>Запустить рассылку
-        </button>
-    </form>
-    {% endif %}
-
-    {% if perms.mailing.can_complete_mailing %}
-    <form method="post" action="{% url 'mailing:complete_mailing' mailing.pk %}">
-        {% csrf_token %}
-        <button class="btn btn-dark rounded-pill px-3" type="submit" {% if mailing.status !='running' %}disabled{% endif
-                %}>Завершить рассылку
-        </button>
-    </form>
     {% endif %}
 
     {% if mailing.user == user or perms.mailing.can_set_mailing_status %}

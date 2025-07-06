@@ -1,4 +1,5 @@
 <!doctype html>
+{% load group_check %}
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -17,6 +18,10 @@
         <li class="nav-item">
           <a class="nav-link active" href="{% url 'mailing:main' %}">Главная</a>
         </li>
+        {% if user|in_group:"Managers" %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:user_list' %}">Список пользователей</a>
+            </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'users:profile_own' %}">Профиль</a>
         </li>
@@ -29,6 +34,10 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'mailing:mailing_list' %}">Рассылки</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'mailing:mailing_attempt_list' %}">Попытки</a>
+        </li>
+        {% endif %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'users:logout' %}">Выход</a>
         </li>
