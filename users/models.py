@@ -46,6 +46,7 @@ class User(AbstractUser):
         verbose_name_plural = "Пользователи"
         permissions = [
             ("can_block_user", "Может блокировать пользователя"),
+            ("can_view_users", "Может просмотреть пользователей"),
         ]
 
     def __str__(self):

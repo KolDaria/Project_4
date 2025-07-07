@@ -86,10 +86,10 @@ def block_user(request, user_id):
     return redirect('users:user_list')
 
 
-@permission_required('auth.view_user')  # or specific permission
+@permission_required('users.can_view_users')
 def user_list(request):
     users = User.objects.all()
-    return render(request, 'users:user_list.html', {'users': users})
+    return render(request, 'users_list.html', {'users': users})
 
 @permission_required('auth.change_user')
 def toggle_user_status(request, user_id):

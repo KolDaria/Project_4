@@ -15,6 +15,6 @@ urlpatterns = [
     path('profile/edit/', edit_profile, name='edit_profile'),
     path('profile/<int:pk>/', view_profile, name='profile'),
     path('profile/', view_own_profile, name='profile_own'),
-    path('users/', user_list, name='user_list'),
+    path('', user_list, name='user_list'),
     path('<int:user_id>/toggle/', toggle_user_status, name='toggle_user_status'),
 ]
