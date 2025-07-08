@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Рассылка: {{ mailing.message }}</h1>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li
+        {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if mailing.user == user or perms.mailing.can_set_mailing_status %}
+    <a href="{% url 'mailing:mailing_edit' mailing.pk %}" class="btn btn-dark rounded-pill px-3">Редактировать</a>
+    <a href="{% url 'mailing:mailing_delete' mailing.pk %}" class="btn btn-dark rounded-pill px-3">Удалить</a>
+    {% endif %}
+
+    <a href="{% url 'mailing:mailing_list' %}" class="btn btn-dark rounded-pill px-3">Вернуться к списку</a>
+</div>
+{% endblock %}

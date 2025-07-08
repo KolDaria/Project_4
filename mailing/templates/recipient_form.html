@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Создать получателя</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-dark rounded-pill px-3">Сохранить</button>
+        <a href="{% url 'mailing:recipient_list' %}" class="btn btn-dark rounded-pill px-3">Отмена</a>
+    </form>
+</div>
+{% endblock %}

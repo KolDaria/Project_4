@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Удалить рассылку</h1>
+    <p>Вы уверены, что хотите удалить "{{ mailing.message }}"?</p>
+    {% if mailing.user == user or perms.user.mailing_delete %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-dark rounded-pill px-3">Удалить</button>
+            <a href="{% url 'mailing:mailing_list' %}" class="btn btn-dark rounded-pill px-3">Отмена</a>
+        </form>
+    {% else %}
+        <p>У вас нет прав на удаление этой рассылки.</p>
+        <a href="{% url 'mailing:mailing_list' %}" class="btn btn-dark rounded-pill px-3">Вернуться к списку</a>
+    {% endif %}
+</div>
+{% endblock %}
