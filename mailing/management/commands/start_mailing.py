@@ -19,26 +19,25 @@ class Command(BaseCommand):
             mailing = Mailing.objects.get(pk=mailing_id)
 
             if mailing.status == 'created' or mailing.status == 'completed':
-                # Запускаем рассылку (логика "start")
-                send_mailing(mailing)  # Отправляем рассылку синхронно
+                send_mailing(mailing)
                 mailing.status = 'running'
                 if mailing.first_send_datetime is None:
                     mailing.first_send_datetime = timezone.now()
-                mailing.end_send_datetime = timezone.now() # Обновляем дату окончания при каждой отправке
+                mailing.end_send_datetime = timezone.now()
                 with transaction.atomic():
-                    mailing.save()  # Оборачиваем в транзакцию сохранение
+                    mailing.save()
                 self.stdout.write(self.style.SUCCESS(
                     f"Рассылка '{mailing.message.subject_letter}' (ID: {mailing_id}) запущена."))
 
             elif mailing.status == 'running':
-                # Завершаем рассылку (логика "complete")
                 mailing.status = 'completed'
                 mailing.end_send_datetime = timezone.now()
                 mailing.save()
                 self.stdout.write(self.style.SUCCESS(
                     f"Рассылка '{mailing.message.subject_letter}' (ID: {mailing_id}) завершена."))
             else:
-                 self.stdout.write(self.style.WARNING(f"Рассылка '{mailing.message.subject_letter}' (ID: {mailing_id}) не может быть запущена или завершена."))
+                 self.stdout.write(self.style.WARNING(f"Рассылка '{mailing.message.subject_letter}' "
+                                                      f"(ID: {mailing_id}) не может быть запущена или завершена."))
 
         except Mailing.DoesNotExist:
             raise CommandError(f'Рассылка с ID {mailing_id} не найдена.')

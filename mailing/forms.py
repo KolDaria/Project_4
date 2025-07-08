@@ -1,7 +1,6 @@
-from django import forms
 from django.forms import BooleanField, ModelForm
 
-from mailing.models import Mailing, Recipient, Message
+from mailing.models import Mailing, Message, Recipient
 
 
 class StyleFormMixin:
@@ -20,9 +19,6 @@ class MailingForm(ModelForm):
         self.fields['recipient'].queryset = Recipient.objects.filter(user=user)
         self.fields['message'].queryset = Message.objects.filter(user=user)
 
-
     class Meta:
         model = Mailing
         fields = ['message', 'recipient', 'status']
-
-

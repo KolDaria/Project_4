@@ -1,17 +1,17 @@
-from django.utils import timezone
+import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.management import call_command
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from mailing.forms import MailingForm
 from mailing.models import Mailing, MailingAttempt, Message, Recipient
 from mailing.services import send_mailing
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -52,15 +52,16 @@ def start_mailing_view(request, mailing_id):
 
     return redirect('mailing:mailing_detail', pk=mailing_id)
 
+
 @login_required
 def send_mailing_view(request, mailing_id):
-    logger.debug(f"send_mailing_view вызвана.  mailing_id: {mailing_id}, пользователь: {request.user.username}")  #  Логируем вызов представления
+    logger.debug(f"send_mailing_view вызвана.  mailing_id: {mailing_id}, пользователь: {request.user.username}")
     try:
         mailing = get_object_or_404(Mailing, pk=mailing_id, user=request.user)
-        logger.debug(f"Найдена рассылка: {mailing}.  Статус: {mailing.status}")  #  Логируем найденную рассылку
+        logger.debug(f"Найдена рассылка: {mailing}.  Статус: {mailing.status}")
 
         if mailing.status == 'created' or mailing.status == 'completed':
-            logger.debug(f"Рассылка подходит для запуска.  Вызываем send_mailing.")  #  Логируем перед вызовом send_mailing
+            logger.debug("Рассылка подходит для запуска.")
 
             send_mailing(mailing)
 
@@ -70,18 +71,21 @@ def send_mailing_view(request, mailing_id):
             mailing.end_send_datetime = timezone.now()
             mailing.save()
 
-            logger.debug(f"Рассылка успешно запущена.  Новый статус: {mailing.status}, first_send_datetime: {mailing.first_send_datetime}, end_send_datetime: {mailing.end_send_datetime}")  #  Логируем после запуска
+            logger.debug(f"Рассылка успешно запущена.  Новый статус: {mailing.status}, "
+                         f"first_send_datetime: {mailing.first_send_datetime}, "
+                         f"end_send_datetime: {mailing.end_send_datetime}")
 
             messages.success(request, f"Рассылка '{mailing.message.subject_letter}' запущена.")
         else:
-            logger.warning(f"Рассылка не подходит для запуска. Статус: {mailing.status}")  #  Логируем, если рассылка не подходит
+            logger.warning(f"Рассылка не подходит для запуска. Статус: {mailing.status}")
             messages.error(request, "Рассылка уже запущена или находится в процессе завершения.")
 
     except Exception as e:
-        logger.error(f"Ошибка в send_mailing_view: {e}")  #  Логируем любые ошибки в представлении
+        logger.error(f"Ошибка в send_mailing_view: {e}")
         messages.error(request, f"Произошла ошибка при запуске рассылки: {e}")
 
     return redirect(reverse('mailing:mailing_detail', kwargs={'pk': mailing_id}))
+
 
 @login_required
 @permission_required('mailing.can_complete_mailing')
@@ -184,6 +188,8 @@ class RecipientListView(LoginRequiredMixin, ListView):
     context_object_name = 'recipients'
 
     def get_queryset(self):
+        if self.request.user.groups.filter(name='Модераторы').exists():
+            return Recipient.objects.all()
         return Recipient.objects.filter(user=self.request.user)
 
     def get_context_data(self, **kwargs):
@@ -258,6 +264,8 @@ class MailingListView(LoginRequiredMixin, ListView):
     context_object_name = 'mailings'
 
     def get_queryset(self):
+        if self.request.user.groups.filter(name='Модераторы').exists():
+            return Mailing.objects.all()
         return Mailing.objects.filter(user=self.request.user)
 
     def get_context_data(self, **kwargs):
@@ -323,12 +331,14 @@ class MailingAttemptListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         return context
 
+
 @permission_required("mailing.can_disable_mailing")
 def disable_mailing(request, mailing_id):
     mailing = get_object_or_404(Mailing, pk=mailing_id)
-    mailing.is_active = False
+    mailing.is_active = 'completed'
     mailing.save()
     return redirect('mailing:mailing_list')
+
 
 @permission_required('mailing.can_view_all_mailings')  # Пример права
 def mailing_list_view(request):

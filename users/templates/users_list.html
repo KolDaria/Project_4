@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <h1 class="mb-4">Список пользователей</h1>
 
-    {% if perms.auth.change_user %}
+    {% if perms.users.can_view_users %}
     <p>У пользователя есть права на изменение пользователей.</p>  <!-- Добавлено для отладки -->
     <table class="table">
         <thead>

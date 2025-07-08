@@ -2,8 +2,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
 
 from users.apps import UsersConfig
-from users.views import RegisterView, edit_profile, email_verification, view_own_profile, view_profile, user_list, \
-    toggle_user_status
+from users.views import (RegisterView, edit_profile, email_verification, toggle_user_status, user_list,
+                         view_own_profile, view_profile)
 
 app_name = UsersConfig.name
 

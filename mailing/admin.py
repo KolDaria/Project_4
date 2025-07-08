@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Recipient, Message, Mailing, MailingAttempt
+from .models import Mailing, MailingAttempt, Message, Recipient
 
 
 @admin.register(Recipient)
@@ -14,6 +14,7 @@ class RecipientAdmin(admin.ModelAdmin):
         }),
     )
 
+
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('subject_letter', 'user')
@@ -25,17 +26,19 @@ class MessageAdmin(admin.ModelAdmin):
         }),
     )
 
+
 @admin.register(Mailing)
 class MailingAdmin(admin.ModelAdmin):
-    list_display = ('message', 'status', 'first_send_datetime', 'end_send_datetime', 'user')
-    list_filter = ('status', 'user')
-    search_fields = ('message__subject_letter',) # Поиск по теме письма
-    filter_horizontal = ('recipient',) #  Для ManyToManyField используем filter_horizontal
+    list_display = ('message', 'status', 'first_send_datetime', 'end_send_datetime', 'user',)
+    list_filter = ('status', 'user',)
+    search_fields = ('message__subject_letter',)
+    filter_horizontal = ('recipient',)
     fieldsets = (
         (None, {
             'fields': ('user', 'message', 'recipient', 'status', 'first_send_datetime', 'end_send_datetime')
         }),
     )
+
 
 @admin.register(MailingAttempt)
 class MailingAttemptAdmin(admin.ModelAdmin):
@@ -49,8 +52,7 @@ class MailingAttemptAdmin(admin.ModelAdmin):
     )
 
     def get_queryset(self, request):
-        """Ограничиваем queryset для обычных пользователей"""
         qs = super().get_queryset(request)
         if not request.user.is_superuser:
-            qs = qs.filter(mailing__user=request.user) #Показываем только свои попытки
+            qs = qs.filter(mailing__user=request.user)
         return qs

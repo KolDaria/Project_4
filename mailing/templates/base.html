@@ -18,7 +18,7 @@
         <li class="nav-item">
           <a class="nav-link active" href="{% url 'mailing:main' %}">Главная</a>
         </li>
-        {% if user|in_group:"Managers" %}
+        {% if user|in_group:"Модераторы" %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'users:user_list' %}">Список пользователей</a>
             </li>
@@ -40,7 +40,10 @@
         </li>
         {% endif %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'users:logout' %}">Выход</a>
+          <form method='post' action="{% url 'users:logout' %}">
+            {% csrf_token %}
+            <button class="nav-link">Выход</button>
+          </form>
         </li>
         {% else %}
         <li class="nav-item">
